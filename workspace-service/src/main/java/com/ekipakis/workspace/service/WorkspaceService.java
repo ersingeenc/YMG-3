@@ -25,6 +25,14 @@ public class WorkspaceService {
         this.memberRepository = memberRepository;
     }
 
+    public Workspace getById(Long id) {
+
+        return workspaceRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Workspace bulunamadı.")
+                );
+    }
+
     @Transactional
     public Workspace create(CreateWorkspaceRequest request) {
 
@@ -52,16 +60,6 @@ public class WorkspaceService {
         return workspaceRepository.findAll();
     }
 
-    public Workspace getById(Long id) {
-
-        return workspaceRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException(
-                                "Workspace bulunamadı."
-                        )
-                );
-    }
-
     public WorkspaceMember addMember(
             Long workspaceId,
             AddMemberRequest request) {
@@ -69,11 +67,10 @@ public class WorkspaceService {
         getById(workspaceId);
 
         boolean exists =
-                memberRepository
-                        .existsByWorkspaceIdAndUserId(
-                                workspaceId,
-                                request.getUserId()
-                        );
+                memberRepository.existsByWorkspaceIdAndUserId(
+                        workspaceId,
+                        request.getUserId()
+                );
 
         if (exists) {
             throw new RuntimeException(
@@ -95,8 +92,22 @@ public class WorkspaceService {
 
         getById(workspaceId);
 
+        return memberRepository.findByWorkspaceId(
+                workspaceId
+        );
+    }
+
+    public boolean isMember(
+            Long workspaceId,
+            Long userId) {
+
+        getById(workspaceId);
+
         return memberRepository
-                .findByWorkspaceId(workspaceId);
+                .existsByWorkspaceIdAndUserId(
+                        workspaceId,
+                        userId
+                );
     }
 
     public List<Workspace> getUserWorkspaces(
@@ -109,8 +120,9 @@ public class WorkspaceService {
                         .map(WorkspaceMember::getWorkspaceId)
                         .toList();
 
-        return workspaceRepository
-                .findAllById(workspaceIds);
+        return workspaceRepository.findAllById(
+                workspaceIds
+        );
     }
 
     public Workspace update(
@@ -119,7 +131,10 @@ public class WorkspaceService {
 
         Workspace workspace = getById(id);
 
-        workspace.setName(newWorkspace.getName());
+        workspace.setName(
+                newWorkspace.getName()
+        );
+
         workspace.setDescription(
                 newWorkspace.getDescription()
         );
@@ -137,6 +152,19 @@ public class WorkspaceService {
         if (workspace.getOwnerId().equals(userId)) {
             throw new RuntimeException(
                     "Workspace sahibi workspace'den çıkarılamaz."
+            );
+        }
+
+        boolean exists =
+                memberRepository
+                        .existsByWorkspaceIdAndUserId(
+                                workspaceId,
+                                userId
+                        );
+
+        if (!exists) {
+            throw new RuntimeException(
+                    "Kullanıcı workspace üyesi değil."
             );
         }
 

@@ -1,4 +1,7 @@
 package com.ekipakis.task.enums;
 
-public class TaskPriority {
+public enum TaskPriority {
+    LOW,
+    MEDIUM,
+    HIGH
 }

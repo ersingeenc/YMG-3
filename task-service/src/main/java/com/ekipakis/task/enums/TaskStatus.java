@@ -1,4 +1,7 @@
 package com.ekipakis.task.enums;
 
-public class TaskStatus {
+public enum TaskStatus {
+    TODO,
+    IN_PROGRESS,
+    DONE
 }

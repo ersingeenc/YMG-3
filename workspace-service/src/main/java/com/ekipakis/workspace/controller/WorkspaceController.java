@@ -70,12 +70,27 @@ public class WorkspaceController {
         );
     }
 
+    @GetMapping("/{workspaceId}/members/{userId}/exists")
+    public ResponseEntity<Boolean> isMember(
+            @PathVariable Long workspaceId,
+            @PathVariable Long userId) {
+
+        return ResponseEntity.ok(
+                workspaceService.isMember(
+                        workspaceId,
+                        userId
+                )
+        );
+    }
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Workspace>> getUserWorkspaces(
             @PathVariable Long userId) {
 
         return ResponseEntity.ok(
-                workspaceService.getUserWorkspaces(userId)
+                workspaceService.getUserWorkspaces(
+                        userId
+                )
         );
     }
 
@@ -85,7 +100,10 @@ public class WorkspaceController {
             @RequestBody Workspace workspace) {
 
         return ResponseEntity.ok(
-                workspaceService.update(id, workspace)
+                workspaceService.update(
+                        id,
+                        workspace
+                )
         );
     }
 
@@ -99,6 +117,8 @@ public class WorkspaceController {
                 userId
         );
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity
+                .noContent()
+                .build();
     }
 }
